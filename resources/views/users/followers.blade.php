@@ -12,8 +12,8 @@
             @if (Auth::id() == $user->id)
                 @include('microposts.form')
             @endif
-            
-            @include('microposts.microposts')
+    
+            @include('users.users')
         </div>
     </div>
 @endsection

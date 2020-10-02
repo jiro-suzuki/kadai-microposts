@@ -19,7 +19,6 @@ class MicropostsController extends Controller
                 'user' => $user,
                 'microposts' => $microposts,
             ];
-           
         }
         
         return view('welcome', $data);
