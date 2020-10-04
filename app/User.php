@@ -44,7 +44,7 @@ class User extends Authenticatable
     
     public function loadRelationshipCounts()
     {
-        return $this->loadCount(['microposts', 'followings', 'followers']);
+        return $this->loadCount(['microposts', 'followings', 'followers', 'favorites']);
     }
     
     public function followings()
@@ -97,5 +97,48 @@ class User extends Authenticatable
         $userIds[] = $this->id;
         
         return Micropost::whereIn('user_id', $userIds);
+    }
+    
+    public function favorites()
+    {
+        return $this->belongsToMany(Micropost::class, 'favorites', 'user_id', 'micropost_id')->withTimestamps();
+    }
+    
+    public function favorite($id)
+    {
+        $micropost = Micropost::findOrFail($id);
+
+        $exist = $this->is_favorites($micropost->id);
+        
+        // $its_mine = $this->id == $micropost->user_id;
+        
+        // if ($exist || $its_mine) {
+        if ($exist) {
+            return false;
+        } else {
+            $this->favorites()->attach($micropost->id);
+            return true;
+        }
+    }
+    public function unfavorite($id)
+    {
+        $micropost = Micropost::findOrFail($id);
+        
+        $exist = $this->is_favorites($micropost->id);
+        
+        // $its_mine = $this->id == $micropost->user_id;
+        
+        // if ($exist && !$its_mine) {
+        if ($exist) {
+            $this->favorites()->detach($micropost->id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function is_favorites($micropostId)
+    {
+        return $this->favorites()->where('micropost_id', $micropostId)->exists();
     }
 }
